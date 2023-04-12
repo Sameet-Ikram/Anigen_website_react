@@ -19,12 +19,21 @@ mongoose.connect("mongodb://localhost:27017/myLoginRegisterDB", {
 const userSchema = new mongoose.Schema({
   name:String,
   email:String,
-  password:String
+  password:String,
+  avatarUrl: {
+    type: String,
+    default: ""
+  },
+  filename:{
+    type: [String],
+    default: ["default","file1"]
+  }
 })
 const User = new mongoose.model("User", userSchema)
 //Routes
 app.post("/login",(req,res)=>{
   const { email, password} = req.body
+  console.log("Login");
   User.findOne({email:email},(err,user)=>{
     if(user){
       if(password===user.password){
@@ -39,6 +48,40 @@ app.post("/login",(req,res)=>{
     }
   })
 })
+
+app.get("/:email/filenames", (req, res) => {
+  const email = req.params.email;
+  User.findOne({ email: email }, (err, user) => {
+    if (user) {
+      res.send({ filenames: user.filename });
+    } else {
+      res.send({ message: "User not found" });
+    }
+  });
+});
+
+app.post("/avatar", (req, res) => {
+
+  const { email, avatarUrl } = req.body;
+  console.log("Updating avatar for user with email:", email);
+  console.log("New avatar URL:", avatarUrl);
+  User.findOne({ email: email }, (err, user) => {
+    if (user) {
+      user.avatarUrl = avatarUrl;
+      user.save((err) => {
+        if (err) {
+          console.log(err);
+          res.send({ message: "Error updating user" });
+        } else {
+          res.send({ message: "Avatar URL updated successfully" });
+        }
+      });
+    } else {
+      res.send({ message: "User not found" });
+    }
+  });
+});
+
 
 app.post("/register",(req,res)=>{
   const { name, email, password} = req.body
