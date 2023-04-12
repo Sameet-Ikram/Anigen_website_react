@@ -13,6 +13,7 @@ import Contact from './components/Contact/contact'
 import Login from './components/LogIn/Login'
 import TTS from './components/TTS/TTS'
 import Video from './components/Video/Video'
+import WebGL from './components/Web GL/WebGL';
 import Register from './components/Register/Register'
 import Footer from './components/Footer/footer'
 import {Route, Routes} from 'react-router-dom'
@@ -27,7 +28,8 @@ function App() {
       <Route path="/difference" element={<Difference/>}/>
       <Route path="/avatar" element={<Avatar/>}/>
       <Route path="/TTS" element={<TTS/>}/>
-      <Route path="/video" element={<Video/>}/>
+       <Route path="/video" element={<WebGL/>}/> 
+      {/* <Route path="/video" element={<Video/>}/> */}
       <Route path="/service" element={<Service/>}/>
       <Route path="/contact" element={<Contact/>}/>
       <Route path="/login" element={<Login/>}/>

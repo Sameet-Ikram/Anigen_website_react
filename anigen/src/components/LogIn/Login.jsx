@@ -27,6 +27,7 @@ const Login = () => {
     .then( res => {
       if(res.data.message==='LogIn successful'){
         localStorage.setItem("user",res.data.user)
+        localStorage.setItem("name",res.data.user.email)
         history("/home",{state:{id:res.data.user.name}})
         history(0)
       }

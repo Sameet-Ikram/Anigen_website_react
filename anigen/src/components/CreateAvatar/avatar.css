@@ -5,11 +5,27 @@
   height: 98px;
   justify-content: center;
 }
-.toggleButton {
+/* .toggleButton {
   margin: 1rem;
-}
+} */
 .iFrame {
   border: none;
   width: 100%;
   height: calc(100vh - 100px);
+}
+
+.toggleButton {
+  background-color: #007bff;
+  border: none;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.toggleButton:hover {
+  background-color: #0069d9;
 }

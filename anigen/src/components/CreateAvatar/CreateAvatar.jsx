@@ -1,3 +1,4 @@
+import axios from "axios"
 import React, { useEffect, useRef, useState } from 'react';
 import './avatar.css'
 const CreateAvatar = () => {
@@ -5,7 +6,11 @@ const CreateAvatar = () => {
   const iFrameRef = useRef(null)
   const [avatarUrl, setAvatarUrl] = useState('')
   const [showIFrame, setShowIFrame] = useState(true)
-
+  const [user, setUser] = useState({
+    email: localStorage.getItem('name'),
+    avatarUrl: ''
+  })
+  const email = localStorage.getItem("name");
   useEffect(() => {
     let iFrame = iFrameRef.current
     if(iFrame) {
@@ -45,6 +50,22 @@ const CreateAvatar = () => {
       console.log(`Avatar URL: ${json.data.url}`);
       setAvatarUrl(json.data.url)
       setShowIFrame(false);
+      setUser({
+        ...user,
+        email: email,
+        avatarUrl: json.data.url
+      });
+      alert(user.email)
+      alert(user.avatarUrl)
+      axios.post("http://localhost:4000/avatar",user)
+        .then(response => {
+          alert("Hi");
+          alert(response.data.message);
+          console.log(response.data.message);
+        })
+        .catch(error => {
+          console.error(error);
+        });
     }
     // Get user id
     if (json.eventName === 'v1.user.set') {
@@ -69,7 +90,7 @@ ${JSON.stringify(json)}`);
       type="button"
       value={`${showIFrame ? 'Close': 'Open'} creator`}
     />
-    <p id="avatarUrl">Avatar URL: {avatarUrl}</p>
+    
   </div>
   <iframe
     allow="camera *; microphone *"
