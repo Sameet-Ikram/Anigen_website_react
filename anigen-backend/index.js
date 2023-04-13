@@ -8,7 +8,8 @@ app.use(express.json())
 app.use(express.urlencoded())
 app.use(cors())
 
-mongoose.connect("mongodb://localhost:27017/myLoginRegisterDB", {
+  mongoose.connect("mongodb://localhost:27017/AnigenDB", {
+ // mongoose.connect("mongodb+srv://umairafzal92:gearofwar1234@cluster0.kn9tbkm.mongodb.net/?retryWrites=true&w=majority",{
     useNewUrlParser: true,
     useUnifiedTopology: true
 }, () => {
@@ -26,7 +27,7 @@ const userSchema = new mongoose.Schema({
   },
   filename:{
     type: [String],
-    default: ["default","file1"]
+    default: ["default"]
   }
 })
 const User = new mongoose.model("User", userSchema)
@@ -49,7 +50,7 @@ app.post("/login",(req,res)=>{
   })
 })
 
-app.get("/:email/filenames", (req, res) => {
+app.get("/TTS/:email/filenames", (req, res) => {
   const email = req.params.email;
   User.findOne({ email: email }, (err, user) => {
     if (user) {
@@ -59,6 +60,42 @@ app.get("/:email/filenames", (req, res) => {
     }
   });
 });
+
+app.get("/WebGL/:email/avatarURL", (req, res) => {
+  const email = req.params.email;
+  User.findOne({ email: email }, (err, user) => {
+    if (user) {
+      res.send({ avatarURL: user.avatarUrl });
+    } else {
+      res.send({ message: "User not found" });
+    }
+  });
+});
+
+
+app.post("/TTS/:email", (req, res) => {
+  const email = req.params.email;
+  console.log(req.body);
+  const { filename } = req.body;
+  User.findOne({ email: email }, (err, user) => {
+    if (user) {
+      user.filename.push(filename);
+      user.save((err) => {
+        if (err) {
+          console.log(err);
+          res.send({ message: "Error updating user" });
+        } else {
+          res.send({ message: "Filename added successfully" });
+        }
+      });
+    } else {
+      res.send({ message: "User not found" });
+    }
+  });
+});
+
+
+
 
 app.post("/avatar", (req, res) => {
 
@@ -83,7 +120,7 @@ app.post("/avatar", (req, res) => {
 });
 
 
-app.post("/register",(req,res)=>{
+app.post("/r",(req,res)=>{
   const { name, email, password} = req.body
   User.findOne({email:email},(err,user)=>{
     if(user){
@@ -106,7 +143,8 @@ app.post("/register",(req,res)=>{
     }
   })
 
-})
+});
+
 
 const port = process.env.PORT || 4000;
 const server = app.listen(port, () => {
