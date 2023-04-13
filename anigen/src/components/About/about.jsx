@@ -17,15 +17,11 @@ const about = () => {
               who <b>We</b> Are?
               </h1>
               <hr className="w-50"/>
-              <p className="lead mb-4">
-              This is what we are here a whole information will be written. for right now i am going to write some fazul stuff
-              just to fill it up. i will write main content later some time This is what we are here a whole information will be written. for right now i am going to write some fazul stuff
-              just to fill it up. i will write main content later some time This is what we are here a whole information will be written. for right now i am going to write some fazul stuff
-              just to fill it up. i will write main content later some time This is what we are here a whole information will be written. for right now i am going to write some fazul stuff
-              just to fill it up. i will write main content later some time This is what we are here a whole information will be written. for right now i am going to write some fazul stuff
-              just to fill it up. i will write main content later.
-              </p>
-              <button className="btn btn-primary rounded-pill px-4 py-2">Get Started</button>
+              <p className="lead mb-4" style={{ textAlign: "justify" }}>
+  Welcome to Anigen, the leading platform for animation generation! Our mission is to revolutionize the way people consume and create multimedia content in Urdu language. At Anigen, we believe that language should never be a barrier to creativity. That's why we developed a cutting-edge technology that turns Urdu speech into stunning 3D videos, complete with an avatar speaking the Urdu text in Urdu language, with perfect lip sync. Our team of talented developers and designers has been working tirelessly to make Anigen the best platform for Urdu speakers around the world. We're passionate about empowering people to express themselves through animation, and we're committed to making the process as easy and accessible as possible. Whether you're a content creator, a marketer, or just someone who loves animation, we're confident that you'll love Anigen. So why wait? Sign up now and start creating your own animated videos in Urdu language with Anigen!
+</p>
+
+              <button className="btn btn-primary rounded-pill px-4 py-2 me-2">Get Started</button>
               <button className="btn btn-primary rounded-pill px-4 py-2">Contact Us</button>
             </div>
           </div>

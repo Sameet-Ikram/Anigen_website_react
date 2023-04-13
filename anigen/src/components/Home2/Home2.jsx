@@ -25,7 +25,7 @@ const Home2 = () => {
             </p>
             <div className="buttons d-flex justify-content-center">
               <NavLink to="/contact" className="btn btn-light me-4 rounded-pill px-4 py-2">Get Quote</NavLink>
-              <NavLink to="/register" className="btn btn-outline-primary py-2 me-4 px-4 rounded-pill">Register</NavLink>
+              <NavLink to="/register" className="btn btn-outline-primary py-2 me-4 px-4 rounded-pill" style={{ color: "white", borderColor: "white" }}>Register</NavLink>
             </div>
           </div>
         </div>

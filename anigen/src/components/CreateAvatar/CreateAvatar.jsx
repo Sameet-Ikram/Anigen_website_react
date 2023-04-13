@@ -48,18 +48,18 @@ const CreateAvatar = () => {
     // Get avatar GLB URL
     if (json.eventName === 'v1.avatar.exported') {
       console.log(`Avatar URL: ${json.data.url}`);
-      setAvatarUrl(json.data.url)
+      setAvatarUrl(json.data.url);
+      alert(json.data.url);
       setShowIFrame(false);
       setUser({
         ...user,
         email: email,
         avatarUrl: json.data.url
       });
-      alert(user.email)
-      alert(user.avatarUrl)
+      console.log(user);
       axios.post("http://localhost:4000/avatar",user)
         .then(response => {
-          alert("Hi");
+          alert("posted");
           alert(response.data.message);
           console.log(response.data.message);
         })
@@ -90,7 +90,7 @@ ${JSON.stringify(json)}`);
       type="button"
       value={`${showIFrame ? 'Close': 'Open'} creator`}
     />
-    
+
   </div>
   <iframe
     allow="camera *; microphone *"

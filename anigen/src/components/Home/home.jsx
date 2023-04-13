@@ -19,11 +19,11 @@ const home = () => {
               An Automated Urdu Spokeperson
             </h2>
             <p className='lead text-center fs-4 mb-5 text-white'>
-              Something will go over here that i will check later. For now lets go with this text
+              Empowering Urdu speakers worldwide to express themselves through cutting-edge animation technology, creating stunning 3D videos with perfect lip sync
             </p>
             <div className="buttons d-flex justify-content-center">
               <NavLink to="/contact" className="btn btn-light me-4 rounded-pill px-4 py-2">Get Quote</NavLink>
-              <NavLink to="/register" className="btn btn-outline-primary py-2 me-4 px-4 rounded-pill">Register</NavLink>
+              <NavLink to="/register" className="btn btn-outline-primary py-2 me-4 px-4 rounded-pill" style={{ color: "white", borderColor: "white" }}>Register</NavLink>
             </div>
           </div>
         </div>
