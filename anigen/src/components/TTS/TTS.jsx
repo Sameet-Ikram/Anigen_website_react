@@ -69,11 +69,9 @@ const handleReplay = () => {
      const blobb = new Blob([blob], { type: 'audio/wav' });
      formData.append('audio_file', blob, filenamme);
     try {
-      const res = await axios.post(`http://localhost:5000/addVoice?email=${email}&voicename=${voicename}`, formData);
-      alert(res.data); // Do something with the response
+      const res = await axios.post(`http://localhost:5000/addVoice?email=${email}&voicename=${voicename}`, formData); // Do something with the response
     } catch (error) {
       console.error(error);
-      alert(error);
     }
     setAudioUrl(url);
   };
@@ -94,7 +92,7 @@ const handleReplay = () => {
     const email=localStorage.getItem("name");
     if(filenameValue=="default"){
     try {
-       const res = await axios.get(`http://localhost:5000/generateaudio?text=${script}&speaker=VCTK_old_20I-0407@nu.edu.pk`,{ responseType: 'blob'} );
+       const res = await axios.get(`http://localhost:5000/generateaudio?text=${script}&speaker=VCTK_old_20I-2440@nu.edu.pk`,{ responseType: 'blob'} );
                 let blob = new Blob([res.data], { type: 'audio/wav' });
                 console.log(blob);
                 audioUrl = URL.createObjectURL(blob);
