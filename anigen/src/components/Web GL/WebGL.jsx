@@ -1,9 +1,10 @@
-import React, { useEffect,useState,Fragment } from "react";
-import {Unity ,useUnityContext } from "react-unity-webgl";
+import React, { useEffect,useState,Fragment,useRef } from "react";
 import axios from "axios";
+import MyThreeScene from "../3DRender/MyThreeScene";
 
 const WebGL=() => {
 
+  const canvasRef = useRef(null);
   var [recorder, setRecorder] = useState(null);
   var [data, setData] = useState([]);
   const [filenames, setFilenames] = useState([]);
@@ -11,25 +12,18 @@ const WebGL=() => {
 
   const [filenameValue, setFilenameValue] = useState('');
 
-  const { unityProvider , sendMessage , unload, loadingProgression, isLoaded} = useUnityContext({
-    loaderUrl: "/build/WebGLBuilds.loader.js",
-    dataUrl: "/build/WebGLBuilds.data.unityweb",
-    frameworkUrl: "/build/WebGLBuilds.framework.js.unityweb",
-    codeUrl: "/build/WebGLBuilds.wasm.unityweb",
-  });
-
-  useEffect(() => {
-    const fetchFilenames = async () => {
-      try {
-        const email = localStorage.getItem('name');
-        const response = await axios.get(`http://localhost:4000/TTS/${email}/filenames`);
-        setFilenames(response.data.filenames);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchFilenames();
-  }, []);
+  // useEffect(() => {
+  //   const fetchFilenames = async () => {
+  //     try {
+  //       const email = localStorage.getItem('name');
+  //       const response = await axios.get(`http://localhost:4000/TTS/${email}/filenames`);
+  //       setFilenames(response.data.filenames);
+  //     } catch (error) {
+  //       console.error(error);
+  //     }
+  //   };
+  //   fetchFilenames();
+  // }, []);
 
 
   const handleFilenameChange = (event) => {
@@ -37,18 +31,10 @@ const WebGL=() => {
   };
 
 
-
-  function GetUrl(){
-  // sendMessage("Runtime Example","setString","https://api.readyplayer.me/v1/avatars/632d65e99b4c6a4352a9b8db.glb");
-    sendMessage("Runtime Example","setString","https://models.readyplayer.me/63df4c591f25f849e5e4ffbd.glb");
-  }
-
-
-
   async function generateVideo() {
 
-    const canvas = document.querySelector("canvas");
-      const stream = canvas.captureStream(30);
+    const canvas = document.querySelector("#canvas");
+      const stream = canvas.captureStream(60);
       recorder = new MediaRecorder(stream);
       recorder.ondataavailable = (event) => {
         data.push(event.data);
@@ -65,9 +51,7 @@ const WebGL=() => {
 
       console.log(blob)
       console.log("recording stopped");
-      // r.getSeekableBlob(blob, async function (seekableBlob) {
-      //   blob = seekableBlob;
-      // });
+     
 
       var url = URL.createObjectURL(blob);
       var video = document.querySelector("video");
@@ -104,18 +88,11 @@ const WebGL=() => {
       video.src = url;
   }
 
-  async function handleClickBack() {
-
-    await unload();
-    // Ready to navigate to another page.
-  }
-
+  
 
   return (
     <Fragment>
-     {!isLoaded && (
-        <p>Loading Application... {Math.round(loadingProgression * 100)}%</p>
-      )}
+
       <div className="d-flex justify-content-center">
         <div className="row">
           <div className="col-md-8">
@@ -139,12 +116,11 @@ const WebGL=() => {
           </div>
         </div>
       </div>
-
+      <canvas ref={canvasRef}></canvas>
+      <MyThreeScene canvasRef={canvasRef}/>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", margin:"0 0 2vh 0"  }}>
-      <Unity unityProvider={unityProvider} style={{ width: "600px", height: "400px" ,visibility: isLoaded ? "visible" : "hidden", margin:"auto", display:"block"}} />
       <video id="video" width="42%" height="42%" controls style={{display:"block", margin:"0 auto"}}></video>
     </div>
-    <button onClick={GetUrl()} style={{display:"none"}}>Spawn Enemies</button>
     </Fragment>
   );
 
