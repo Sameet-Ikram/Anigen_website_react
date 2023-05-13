@@ -10,7 +10,11 @@ const TTS = () => {
   const [showbuttons, setShowbuttons] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [script, setScript] = useState('');
-
+  const [textValue, setTextValue] = useState("");
+  const [textValue2, setTextValue2] = useState("");
+  const [showButton, setShowButton] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
 const handlePlay = () => {
   const audio = new Audio(audioUrl);
   audio.play();
@@ -85,9 +89,13 @@ const handleReplay = () => {
   const handleVideoDisplay= ()=>{
     setShowFields(true);
     setShowbuttons(false);
+    setShowButton(false);
+
   }
 
   const handleGenerateAudio = async (event) => {
+    setLoading(false);
+    setMessage("Loading...");
     let audioUrl;
     const email=localStorage.getItem("name");
     if(filenameValue=="default"){
@@ -97,9 +105,14 @@ const handleReplay = () => {
                 console.log(blob);
                 audioUrl = URL.createObjectURL(blob);
                 setAudioUrl(audioUrl);
+                setLoading(true);
+                setMessage("Generated Successfully");
+
+
   }catch (error) {
       console.error(error);
-      alert(error);
+      setLoading(false);
+      setMessage("Network error. Please check your connection.");
     }
   }
   else
@@ -111,9 +124,12 @@ const handleReplay = () => {
                 console.log(blob);
                 audioUrl = URL.createObjectURL(blob);
                 setAudioUrl(audioUrl);
+                setLoading(true);
+                setMessage("Generated Successfully");
   }catch (error) {
       console.error(error);
-      alert(error);
+      setLoading(false);
+      setMessage("Network error. Please check your connection.");
     }
   }
   }
@@ -132,7 +148,6 @@ const handleReplay = () => {
   };
 
 
-
   return (
     <div>
         <div className="container shadow my-5">
@@ -143,18 +158,20 @@ const handleReplay = () => {
             <div className="col-md-6 p-5">
               <h1 className="display-6 fw-bolder mb-5">Turn Your Text To Speech</h1>
               <div className="mb-3 row">
-              <textarea placeholder="Enter your script" onChange={handleScriptChange}></textarea>
+              {message && <div className={`alert alert-${loading ? 'success' : 'danger'}`} role="alert">{message}</div>}
+              <textarea id="text-box" placeholder="Enter your script (minimum 20 characters)" value={textValue} onChange={e=>setTextValue(e.target.value)}></textarea>
 
               { showbuttons && (
-                <div>
-              <textarea style={{width:"30vh", height:"7vh",marginTop:"1vh", marginLeft:"-1.75vh"}} id="voicename" placeholder="Enter a voicename"></textarea>
+  <div>
+    <textarea style={{width:"30vh", height:"7vh",marginTop:"1vh", marginLeft:"-1.75vh"}} id="voicename" placeholder="Enter a voicename" value={textValue2} onChange={e=>setTextValue2(e.target.value)} ></textarea>
 
-              <label className="btn btn-secondary mx-2" style={{marginTop:"-6vh"}}>
-                Upload Audio
-                <input type="file" hidden accept=".wav,.audio" onChange={handleAudioUpload} />
-                </label>
-                </div>
-                )}
+    <button className="btn btn-secondary mx-2" style={{marginTop:"-6vh"}} disabled={!textValue2.trim()} onClick={() => document.querySelector('input[type="file"]').click()}>
+  Upload Audio
+  <input type="file" hidden accept=".wav,.audio" onChange={handleAudioUpload} />
+</button>
+
+  </div>
+)}
 
                 {showFields && (
                   <>
@@ -176,11 +193,11 @@ const handleReplay = () => {
                 )}
                 <hr />
                 <div className="col-sm-12 d-flex">
-
-                  <button type="submit" className="btn btn-primary" onClick={handleVideoDisplay} style={{marginLeft:"-2vh"}}>
+                  {showButton && (
+                  <button  type="submit" className="btn btn-primary" onClick={handleVideoDisplay} disabled={textValue.trim().length < 20} style={{marginRight:"4vh", marginLeft:"-2vh"}}>
                     Generate Audio
-                  </button>
-                  <button type="submit" className="btn btn-primary" onClick={handleAudioDisplay} style={{marginLeft:"2vh"}}>
+                  </button>)}
+                  <button type="submit" className="btn btn-primary" onClick={handleAudioDisplay} style={{marginLeft:"-2vh"}}>
                   Audio Upload
                   </button>
                 </div>

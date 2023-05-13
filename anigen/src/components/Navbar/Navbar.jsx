@@ -1,12 +1,42 @@
 import React from 'react'
 import {NavLink,useNavigate} from 'react-router-dom';
+import {useState, useEffect} from 'react';
+import axios from 'axios';
 const Navbar = () =>{
-  const auth= localStorage.getItem("user")
+  const [avatarurl, setavatarurl] = useState([]);
+  const [message, setMessage] = useState("");
+  const [success, setSuccess] = useState(false);
+  const auth= localStorage.getItem("user");
   const navigate=useNavigate()
   const logout= () => {
     localStorage.clear();
     navigate('/')
   }
+  useEffect(()=>{
+    const fetchAvatarUrl = async () => {
+      try {
+        const email = localStorage.getItem('name');
+        console.log("URLL working?");
+        const response = await axios.get(`http://localhost:4000/ThreeScene/${email}/avatarurl`);
+        setavatarurl(response.data.avatarurl);
+        console.log("URLL");
+        console.log(avatarurl);
+      } catch (error) {
+        console.log("errorrrr");
+        console.error(error);
+      }
+    };
+    fetchAvatarUrl();
+  });
+  const handleVideoClick = () => {
+    if (avatarurl) {
+    } else {
+      alert("Please create an avatar first");
+      window.location.href = '/avatar';
+      setSuccess(false);
+      setMessage("Please create an avatar first");
+    }
+  };
   return(
     <div>
     <nav className="navbar navbar-expand-lg bg-body-tertiary shadow">
@@ -27,8 +57,11 @@ const Navbar = () =>{
 
         </li>
         <li className="nav-item">
-        {auth?<NavLink className="nav-link" to="/Video">Generate Video</NavLink> :<NavLink className="nav-link" to="/contact">Contact</NavLink>}
-
+        {auth ? (
+                  <NavLink className="nav-link" to="/Video" onClick={handleVideoClick}>Generate Video</NavLink>
+                ) : (
+                  <NavLink className="nav-link" to="/contact">Contact</NavLink>
+                )}
         </li>
 
       </ul>
@@ -43,6 +76,7 @@ const Navbar = () =>{
       <i className='fa fa-user-plus me-2'></i>Register</NavLink>}
     </div>
   </div>
+  {message && <div className={`alert alert-${success ? 'success' : 'danger'}`} role="alert">{message}</div>}
 </nav>
     </div>
   );

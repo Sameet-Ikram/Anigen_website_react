@@ -9,21 +9,23 @@ const WebGL=() => {
   var [data, setData] = useState([]);
   const [filenames, setFilenames] = useState([]);
   const [filename, setFilename] = useState([]);
-
+  const [textValue, setTextValue] = useState("");
   const [filenameValue, setFilenameValue] = useState('');
+  const [message, setMessage] = useState("");
+  const [success, setSuccess] = useState(false);
 
-  // useEffect(() => {
-  //   const fetchFilenames = async () => {
-  //     try {
-  //       const email = localStorage.getItem('name');
-  //       const response = await axios.get(`http://localhost:4000/TTS/${email}/filenames`);
-  //       setFilenames(response.data.filenames);
-  //     } catch (error) {
-  //       console.error(error);
-  //     }
-  //   };
-  //   fetchFilenames();
-  // }, []);
+  useEffect(() => {
+    const fetchFilenames = async () => {
+      try {
+        const email = localStorage.getItem('name');
+        const response = await axios.get(`http://localhost:4000/TTS/${email}/filenames`);
+        setFilenames(response.data.filenames);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchFilenames();
+  }, []);
 
 
   const handleFilenameChange = (event) => {
@@ -32,7 +34,8 @@ const WebGL=() => {
 
 
   async function generateVideo() {
-
+    setSuccess(false);
+    setMessage("Genrating Video...");
     const canvas = document.querySelector("#canvas");
       const stream = canvas.captureStream(60);
       recorder = new MediaRecorder(stream);
@@ -45,13 +48,15 @@ const WebGL=() => {
       recorder.stop();
       const blob = new Blob(data, { type: "video/webm" });
       if (blob.size === 0) {
-        alert("No data recorded");
+        console.log("No data recorded");
+        setSuccess(false);
+        setMessage("Error generating video");
         return;
       }
 
       console.log(blob)
       console.log("recording stopped");
-     
+
 
       var url = URL.createObjectURL(blob);
       var video = document.querySelector("video");
@@ -63,10 +68,14 @@ const WebGL=() => {
       const email=localStorage.getItem("name");
       if(filenameValue=="default"){
       var query = `http://localhost:5000/generateVideo?text=${text}&speaker=VCTK_old_20I-2440@nu.edu.pk&email=${email}`;
+      setSuccess(true);
+      setMessage("Video Generated Successfully");
     }
     else{
       if(filenameValue!=""){
         var query = `http://localhost:5000/generateVideo?text=${text}&voicename=${filenameValue}&email=${email}`;
+        setSuccess(true);
+        setMessage("Video Generated Successfully");
       }
       else{
 
@@ -88,7 +97,7 @@ const WebGL=() => {
       video.src = url;
   }
 
-  
+
 
   return (
     <Fragment>
@@ -96,7 +105,7 @@ const WebGL=() => {
       <div className="d-flex justify-content-center">
         <div className="row">
           <div className="col-md-8">
-            <textarea id="script" placeholder="Enter Script" className="form-control mb-3" style={{height:"10vh",marginTop:"2vh"}}></textarea>
+            <textarea id="script" placeholder="Enter Script (minimum 20 characters)" className="form-control mb-3" value={textValue} onChange={e=>setTextValue(e.target.value)} style={{height:"10vh",marginTop:"2vh"}}></textarea>
 		<select
         className="form-select"
         style={{ width: "27vh", height: "5vh", margin:"0 0 1vh 0" }}
@@ -112,15 +121,16 @@ const WebGL=() => {
       </select>
           </div>
           <div className="col-md-4">
-            <button onClick={generateVideo} className="btn btn-primary btn-lg" style={{height:"10vh",marginTop:"2vh"}}>Generate Video</button>
+            <button onClick={generateVideo} disabled={textValue.trim().length < 20||!filenameValue.trim()} className="btn btn-primary btn-lg" style={{height:"10vh",marginTop:"2vh"}}>Generate Video</button>
           </div>
         </div>
       </div>
-      <canvas ref={canvasRef}></canvas>
-      <MyThreeScene canvasRef={canvasRef}/>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", margin:"0 0 2vh 0"  }}>
-      <video id="video" width="42%" height="42%" controls style={{display:"block", margin:"0 auto"}}></video>
-    </div>
+      {message && <div className={`alert alert-${success ? 'success' : 'danger'}`} role="alert" >{message}</div>}
+      <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center", margin:"2vh 0 2vh -28vh" }}>
+    <canvas ref={canvasRef}></canvas>
+    <MyThreeScene canvasRef={canvasRef}/>
+    <video id="video" width="42%" height="42%" controls style={{display:"block", margin:"0 auto"}}></video>
+  </div>
     </Fragment>
   );
 

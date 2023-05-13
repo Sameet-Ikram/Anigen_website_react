@@ -7,6 +7,8 @@ const Register = () => {
     password:"",
     confirmPassword:""
   })
+  const [message, setMessage] = useState("");
+  const [success, setSuccess] = useState(false);
   const handleChange = e =>{
     const {name,value}=e.target
     setUser({
@@ -16,16 +18,39 @@ const Register = () => {
     })
   }
 
-  const registerUser = () =>{
+  const registerUser = (e) =>{
+    e.preventDefault();
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     const {name, email, password, confirmPassword} = user
-    if(name && email && password && password === confirmPassword){
+    if(!emailPattern.test(email)){
+      setSuccess(false);
+      setMessage("Invalid email format");
+    }
+    else if(password.length<8){
+      setSuccess(false);
+      setMessage("Password should be atleast 8 character long!");
+    }
+    else if(name && email && password && password === confirmPassword){
        console.log(password);
       axios.post("http://localhost:4000/r", user)
-      .then( res => console.log(res.data.message))
+      .then( res =>{ console.log(res.data.message)
+    if(res.data.message==="Successfully Registered"){
+      setSuccess(true);
+      setMessage("Signup successful!");
+    }
+  else{
+    setSuccess(false);
+    setMessage("User Already Exists");
+  }})
       .catch( err => console.log(err))
     }
-    else{
-      alert("Invalid Input")
+    else if(password!=confirmPassword){
+      setSuccess(false);
+      setMessage("Password and confirm password do not match!");
+    }
+    else if(res.data.message==="User already registered"){
+      setSuccess(false);
+      setMessage("Error");
     }
   }
   return (
@@ -38,6 +63,7 @@ const Register = () => {
       </div>
         <div className="col-md-6 p-5">
         <h1 className="display-6 fw-bolder mb-5">Register</h1>
+        {message && <div className={`alert alert-${success ? 'success' : 'danger'}`} role="alert">{message}</div>}
         <form>
           <div class="mb-3">
             <label for="exampleInputName" class="form-label" >Name</label>

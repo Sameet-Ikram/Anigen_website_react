@@ -7,32 +7,47 @@ const Login = () => {
   const [user,setUser] = useState({
     email:"",
     password:""
-  })
-  const handleChange=e=>{
-    const {name,value}=e.target
-    setUser({
+  });
+  const [message, setMessage] = useState("");
+  const [success, setSuccess] = useState(false);
 
+  const handleChange=e=>{
+    const {name,value}=e.target;
+    setUser({
       ...user,
       [name]: value
-    })
-  }
+    });
+  };
+
   useEffect(()=>{
-    const auth=localStorage.getItem("user")
+    const auth=localStorage.getItem("user");
     if(auth){
-      history("/home")
+      history("/home");
     }
-  })
+  });
+
   const logInUser = () =>{
     axios.post("http://localhost:4000/login",user)
     .then( res => {
       if(res.data.message==='LogIn successful'){
-        localStorage.setItem("user",res.data.user)
-        localStorage.setItem("name",res.data.user.email)
-        history("/home",{state:{id:res.data.user.name}})
-        history(0)
+        localStorage.setItem("user",res.data.user);
+        localStorage.setItem("name",res.data.user.email);
+        setSuccess(true);
+        setMessage("Login successful!");
+        history("/home",{state:{id:res.data.user.name}});
+        history(0);
       }
-    })
-  }
+      else if (res.data.message === 'Password did not match') {
+        setSuccess(false);
+        setMessage("Incorrect password");
+      }
+      else {
+        setSuccess(false);
+        setMessage("User not found");
+      }
+    });
+  };
+
   return (
     <div>
     {console.log("User",user)}
@@ -43,6 +58,7 @@ const Login = () => {
         </div>
           <div className="col-md-6 p-5">
           <h1 className="display-6 fw-bolder mb-5">Log In</h1>
+          {message && <div className={`alert alert-${success ? 'success' : 'danger'}`} role="alert">{message}</div>}
           <form>
             <div class="mb-3">
               <label for="exampleInputEmail1" class="form-label">Email address</label>
@@ -57,13 +73,13 @@ const Login = () => {
               <input type="checkbox" class="form-check-input" id="exampleCheck1"/>
               <label class="form-check-label" for="exampleCheck1">Check me out</label>
             </div>
-            <button type="submit" class="btn btn-primary" onClick={logInUser}>Submit</button>
+            <button type="button" class="btn btn-primary" onClick={logInUser}>Submit</button>
           </form>
           </div>
         </div>
       </div>
     </div>
   );
-}
+};
 
 export default Login;
