@@ -22,6 +22,11 @@ const Register = () => {
     e.preventDefault();
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     const {name, email, password, confirmPassword} = user
+    if(!(name && email && password && password === confirmPassword)){
+      setSuccess(false);
+      setMessage("All fields are required");
+    }
+    else{
     if(!emailPattern.test(email)){
       setSuccess(false);
       setMessage("Invalid email format");
@@ -33,7 +38,8 @@ const Register = () => {
     else if(name && email && password && password === confirmPassword){
        console.log(password);
       axios.post("http://localhost:4000/r", user)
-      .then( res =>{ console.log(res.data.message)
+      .then( res =>{
+        console.log(res.data.message)
     if(res.data.message==="Successfully Registered"){
       setSuccess(true);
       setMessage("Signup successful!");
@@ -51,7 +57,7 @@ const Register = () => {
     else if(res.data.message==="User already registered"){
       setSuccess(false);
       setMessage("Error");
-    }
+    }}
   }
   return (
     <div>
