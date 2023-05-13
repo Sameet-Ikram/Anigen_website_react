@@ -61,11 +61,12 @@ app.get("/TTS/:email/filenames", (req, res) => {
   });
 });
 
-app.get("/WebGL/:email/avatarURL", (req, res) => {
+app.get("/ThreeScene/:email/avatarurl", (req, res) => {
   const email = req.params.email;
+  console.log("Yes working");
   User.findOne({ email: email }, (err, user) => {
     if (user) {
-      res.send({ avatarURL: user.avatarUrl });
+      res.send({ avatarurl: user.avatarUrl });
     } else {
       res.send({ message: "User not found" });
     }
@@ -100,6 +101,11 @@ app.post("/TTS/:email", (req, res) => {
 app.post("/avatar", (req, res) => {
 
   const { email, avatarUrl } = req.body;
+  if (avatarUrl==='') {
+    console.log("empty");
+    res.send({ message: "Avatar URL is empty" });
+  }
+  else{
   console.log("Updating avatar for user with email:", email);
   console.log("New avatar URL:", avatarUrl);
   User.findOne({ email: email }, (err, user) => {
@@ -117,6 +123,7 @@ app.post("/avatar", (req, res) => {
       res.send({ message: "User not found" });
     }
   });
+}
 });
 
 
