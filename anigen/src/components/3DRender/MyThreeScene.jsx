@@ -5,8 +5,9 @@ import {OrbitControls} from './three/examples/jsm/controls/OrbitControls.js'
 import { GLTFLoader } from './three/examples/jsm/loaders/GLTFLoader.js';
 import { RGBELoader } from './three/examples/jsm/loaders/RGBELoader.js'
 import * as TWEEN from "es6-tween";
-
+import axios from 'axios';
 const MyThreeScene = () => {
+  const email= localStorage.getItem("name");
   const canvasRef = useRef(null);
   var [mixer, setMixer] = useState(null);
   var [scene, setScene] = useState(null);
@@ -14,6 +15,7 @@ const MyThreeScene = () => {
   var [renderer, setRenderer] = useState(null);
   var [controls, setControls] = useState(null);
   var [tween, setTween] = useState(null);
+  const [avatarurl, setavatarurl] = useState([]);
 
   function loadBackground(url, renderer) {
     return new Promise((resolve) => {
@@ -28,14 +30,27 @@ const MyThreeScene = () => {
       })
   }
 
+
+useEffect(()=>{
+  const fetchAvatarUrl = async () => {
+    try {
+      const email = localStorage.getItem('name');
+      console.log("URLL working?");
+      const response = await axios.get(`http://localhost:4000/ThreeScene/${email}/avatarurl`);
+      setavatarurl(response.data.avatarurl);
+    } catch (error) {
+      console.log("errorrrr");
+      console.error(error);
+    }
+  };
+  fetchAvatarUrl();
+});
   useEffect(() => {
 
 
-
-
     TWEEN.autoPlay(true);
-    
-    scene = new THREE.Scene();    
+
+    scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, 600 / 400, 0.1, 1000);
     camera.position.set(-0.07, 0.36, 1.9);
     scene.add(camera);
@@ -46,21 +61,23 @@ const MyThreeScene = () => {
     scene.add(light);
 
     // controls = new OrbitControls(camera, canvasRef.current);
-    
+
 
     const loader = new GLTFLoader();
-
+     // var url=avatarurl;
+     console.log(avatarurl);
+    // var url="https://models.readyplayer.me/64382da0e7bf8de67ca3b623.glb"
+    // var url="https://models.readyplayer.me/64382da0e7bf8de67ca3b623.glb";
     var url = "https://models.readyplayer.me/6440ef60db1175ea30aff768.glb"
     var query = url + "?morphTargets=ARKit"
 
     loader.load(query, (gltf) => {
-    
       scene.add(gltf.scene);
 
       scene.getObjectByName("Armature").position.set(0, -1.2, 1.2);
-      
+
       mixer = new THREE.AnimationMixer(gltf.scene);
-      
+
       const animLoader = new FBXLoader();
       animLoader.load('/assets/BreathingIdle.fbx', (animation) => {
         const clip = animation.animations[0];
@@ -81,10 +98,10 @@ const MyThreeScene = () => {
         console.log(mesh)
         const morphTargetIndex = mesh.morphTargetDictionary[morphTargetParams.key];
         const morphTargetIndex2 = mesh.morphTargetDictionary[morphTargetParams.key2];
-       
+
         if (morphTargetParams) {
           const { transition, targetValue, duration } = morphTargetParams;
-          
+
           const currentValue = {
             v: mesh.morphTargetInfluences[morphTargetIndex],
             v1: mesh.morphTargetInfluences[morphTargetIndex2],
@@ -120,7 +137,7 @@ const MyThreeScene = () => {
       scene.background = envMap;
       // scene.environment = envMap;
     });
- 
+
     const animate = function () {
       requestAnimationFrame(animate);
       renderer.render(scene, camera);
