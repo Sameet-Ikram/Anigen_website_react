@@ -63,7 +63,6 @@ app.get("/TTS/:email/filenames", (req, res) => {
 
 app.get("/ThreeScene/:email/avatarurl", (req, res) => {
   const email = req.params.email;
-  console.log("Yes working");
   User.findOne({ email: email }, (err, user) => {
     if (user) {
       res.send({ avatarurl: user.avatarUrl });

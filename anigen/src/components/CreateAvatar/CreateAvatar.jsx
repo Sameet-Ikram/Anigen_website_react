@@ -3,11 +3,11 @@ import React, { useEffect, useRef, useState } from 'react';
 import './avatar.css'
 import Navbar from '../Navbar/Navbar';
 const CreateAvatar = () => {
-  const subdomain = 'hallway' // See section about becoming a partner
+  const subdomain = 'anigen' // See section about becoming a partner
   const iFrameRef = useRef(null)
-  const [avatarUrl, setAvatarUrl] = useState('')
+  var [avatarUrl, setAvatarUrl] = useState('')
   const [showIFrame, setShowIFrame] = useState(true)
-  const [user, setUser] = useState({
+  var [user, setUser] = useState({
     email: localStorage.getItem('name'),
     avatarUrl: ''
   })
@@ -17,7 +17,7 @@ const CreateAvatar = () => {
   useEffect(() => {
     let iFrame = iFrameRef.current
     if(iFrame) {
-       iFrame.src = `https://${subdomain}.readyplayer.me/avatar?frameApi&bodyType=fullbody`
+       iFrame.src = `https://${subdomain}.readyplayer.me/en/avatar?frameApi`
     }
   })
   useEffect(() => {
@@ -27,7 +27,9 @@ const CreateAvatar = () => {
       window.removeEventListener('message', subscribe)
       document.removeEventListener('message', subscribe)
     }
-  });
+  },[]);
+
+
   function subscribe(event) {
     const json = parse(event)
     if (json?.source !== 'readyplayerme') {
@@ -50,17 +52,20 @@ const CreateAvatar = () => {
     }
     // Get avatar GLB URL
     if (json.eventName === 'v1.avatar.exported') {
-      console.log(`Avatar URL: ${json.data.url}`);
-      setAvatarUrl(json.data.url);
-      localStorage.setItem("avatar",json.data.url);
+
+      avatarUrl = json.data.url;
+      localStorage.setItem("avatar",avatarUrl);
       setShowIFrame(false);
-      setUser({
+      
+      user = {
         ...user,
         email: email,
-        avatarUrl: json.data.url
-      });
+        avatarUrl: avatarUrl
+      };
+
       console.log("data");
       console.log(user);
+      
       axios.post("http://localhost:4000/avatar",user)
         .then(response => {
           if(response.data.message==="Avatar URL updated successfully")
@@ -85,19 +90,21 @@ const CreateAvatar = () => {
     }
     // Get user id
     if (json.eventName === 'v1.user.set') {
-      console.log(`User with id ${json.data.id} set:
-${JSON.stringify(json)}`);
+      console.log(`User with id ${json.data.id} set:${JSON.stringify(json)}`);
+      }
+     
     }
-  }
-  function parse(event) {
-    try {
-      return JSON.parse(event.data);
-    } catch (error) {
-      return null;
+    
+    function parse(event) {
+        try {
+          return JSON.parse(event.data);
+        } catch (error) {
+          return null;
+        }
     }
-  }
-  return (
 
+
+  return (
     <div>
     {message && <div className={`alert alert-${success ? 'success' : 'danger'}`} role="alert">{message}</div>}
     <div className="App">

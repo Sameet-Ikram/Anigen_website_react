@@ -7,7 +7,7 @@ import { RGBELoader } from './three/examples/jsm/loaders/RGBELoader.js'
 import * as TWEEN from "es6-tween";
 import axios from 'axios';
 const MyThreeScene = () => {
-  const email= localStorage.getItem("name");
+  
   const canvasRef = useRef(null);
   var [mixer, setMixer] = useState(null);
   var [scene, setScene] = useState(null);
@@ -15,7 +15,7 @@ const MyThreeScene = () => {
   var [renderer, setRenderer] = useState(null);
   var [controls, setControls] = useState(null);
   var [tween, setTween] = useState(null);
-  const [avatarurl, setavatarurl] = useState([]);
+  var [avatarurl, setavatarurl] = useState('');
 
   function loadBackground(url, renderer) {
     return new Promise((resolve) => {
@@ -31,22 +31,17 @@ const MyThreeScene = () => {
   }
 
 
-useEffect(()=>{
-  const fetchAvatarUrl = async () => {
+  useEffect(async() => {
+
+
     try {
-      const email = localStorage.getItem('name');
-      console.log("URLL working?");
+      const email= localStorage.getItem("name");
       const response = await axios.get(`http://localhost:4000/ThreeScene/${email}/avatarurl`);
-      setavatarurl(response.data.avatarurl);
+      avatarurl = await response.data.avatarurl;
+      console.log(avatarurl);
     } catch (error) {
-      console.log("errorrrr");
       console.error(error);
     }
-  };
-  fetchAvatarUrl();
-});
-  useEffect(() => {
-
 
     TWEEN.autoPlay(true);
 
@@ -60,18 +55,16 @@ useEffect(()=>{
     light.position.set(0, 1, 1);
     scene.add(light);
 
-    // controls = new OrbitControls(camera, canvasRef.current);
-
-
     const loader = new GLTFLoader();
-     // var url=avatarurl;
-     console.log(avatarurl);
-    // var url="https://models.readyplayer.me/64382da0e7bf8de67ca3b623.glb"
-    // var url="https://models.readyplayer.me/64382da0e7bf8de67ca3b623.glb";
-    var url = "https://models.readyplayer.me/6440ef60db1175ea30aff768.glb"
-    var query = url + "?morphTargets=ARKit"
+    
+    if (avatarurl == "") {
+      console.log("avatarurl is null")
+    }
 
-    loader.load(query, (gltf) => {
+    const query = avatarurl + "?morphTargets=ARKit"
+
+      loader.load(query, (gltf) => {
+      
       scene.add(gltf.scene);
 
       scene.getObjectByName("Armature").position.set(0, -1.2, 1.2);
@@ -82,9 +75,14 @@ useEffect(()=>{
       animLoader.load('/assets/BreathingIdle.fbx', (animation) => {
         const clip = animation.animations[0];
         mixer.clipAction(clip).play();
+      },(xhr) => {
+        console.log((xhr.loaded / xhr.total * 100) + '% animation loaded');
+      },(error) => {
+        console.log(error);
       });
 
       const animate2 = async function () {
+
 
         const morphTargetParams = {
           key: "eyeBlinkRight",
@@ -93,9 +91,9 @@ useEffect(()=>{
           transition: 100,
           duration: 200,
         };
-        const mesh = scene.getObjectByName("Armature").children[3];
 
-        console.log(mesh)
+        const mesh = scene.getObjectByName("Armature").getObjectByName("Wolf3D_Avatar");
+
         const morphTargetIndex = mesh.morphTargetDictionary[morphTargetParams.key];
         const morphTargetIndex2 = mesh.morphTargetDictionary[morphTargetParams.key2];
 
@@ -127,6 +125,10 @@ useEffect(()=>{
       };
 
       animate2();
+    },(xhr) => {
+      console.log((xhr.loaded / xhr.total * 100) + '% model loaded');
+    },(error) => {
+      console.log(error);
     });
 
     renderer = new THREE.WebGLRenderer({ antialias: true, canvas: canvasRef.current });

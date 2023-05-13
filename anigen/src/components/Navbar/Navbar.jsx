@@ -12,22 +12,22 @@ const Navbar = () =>{
     localStorage.clear();
     navigate('/')
   }
-  useEffect(()=>{
-    const fetchAvatarUrl = async () => {
-      try {
-        const email = localStorage.getItem('name');
-        console.log("URLL working?");
-        const response = await axios.get(`http://localhost:4000/ThreeScene/${email}/avatarurl`);
-        setavatarurl(response.data.avatarurl);
-        console.log("URLL");
-        console.log(avatarurl);
-      } catch (error) {
-        console.log("errorrrr");
-        console.error(error);
-      }
-    };
-    fetchAvatarUrl();
-  });
+  // useEffect(()=>{
+  //   const fetchAvatarUrl = async () => {
+  //     try {
+  //       const email = localStorage.getItem('name');
+  //       console.log("URLL working?");
+  //       const response = await axios.get(`http://localhost:4000/ThreeScene/${email}/avatarurl`);
+  //       setavatarurl(response.data.avatarurl);
+  //       console.log("URLL");
+  //       console.log(avatarurl);
+  //     } catch (error) {
+  //       console.log("errorrrr");
+  //       console.error(error);
+  //     }
+  //   };
+  //   fetchAvatarUrl();
+  // });
   const handleVideoClick = () => {
     if (avatarurl) {
     } else {
