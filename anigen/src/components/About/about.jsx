@@ -3,6 +3,7 @@ import React from 'react'
 const about = () => {
   return (
     <div>
+
       <section id="about">
         <div className="container my-5 py-5">
           <div className="row">

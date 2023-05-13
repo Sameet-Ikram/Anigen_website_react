@@ -1,6 +1,7 @@
 import axios from "axios"
 import React, { useEffect, useRef, useState } from 'react';
 import './avatar.css'
+import Navbar from '../Navbar/Navbar';
 const CreateAvatar = () => {
   const subdomain = 'hallway' // See section about becoming a partner
   const iFrameRef = useRef(null)
@@ -10,11 +11,13 @@ const CreateAvatar = () => {
     email: localStorage.getItem('name'),
     avatarUrl: ''
   })
+  const [message, setMessage] = useState("");
+  const [success, setSuccess] = useState(false);
   const email = localStorage.getItem("name");
   useEffect(() => {
     let iFrame = iFrameRef.current
     if(iFrame) {
-       iFrame.src = `https://${subdomain}.readyplayer.me/avatar?frameApi`
+       iFrame.src = `https://${subdomain}.readyplayer.me/avatar?frameApi&bodyType=fullbody`
     }
   })
   useEffect(() => {
@@ -49,19 +52,32 @@ const CreateAvatar = () => {
     if (json.eventName === 'v1.avatar.exported') {
       console.log(`Avatar URL: ${json.data.url}`);
       setAvatarUrl(json.data.url);
-      alert(json.data.url);
+      localStorage.setItem("avatar",json.data.url);
       setShowIFrame(false);
       setUser({
         ...user,
         email: email,
         avatarUrl: json.data.url
       });
+      console.log("data");
       console.log(user);
       axios.post("http://localhost:4000/avatar",user)
         .then(response => {
-          alert("posted");
-          alert(response.data.message);
+          if(response.data.message==="Avatar URL updated successfully")
+          {
+          setSuccess(true);
+          setMessage("Avatar Created Successfully");
           console.log(response.data.message);
+        }
+        else if(response.data.message==="Avatar URL is empty"){
+          setSuccess(false);
+          setMessage("Avatar creation error. Please try again");
+          console.log(response.data.message);}
+          else{
+            setSuccess(false);
+            setMessage("Error");
+            console.log(response.data.message);
+          }
         })
         .catch(error => {
           console.error(error);
@@ -81,7 +97,9 @@ ${JSON.stringify(json)}`);
     }
   }
   return (
+
     <div>
+    {message && <div className={`alert alert-${success ? 'success' : 'danger'}`} role="alert">{message}</div>}
     <div className="App">
   <div className="topBar">
     <input
