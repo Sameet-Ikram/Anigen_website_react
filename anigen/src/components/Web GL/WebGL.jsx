@@ -35,7 +35,7 @@ const WebGL=() => {
 
   async function generateVideo() {
     setSuccess(false);
-    setMessage("Genrating Video...");
+    setMessage("Generating Video...");
     const canvas = document.querySelector("#canvas");
       const stream = canvas.captureStream(60);
       recorder = new MediaRecorder(stream);
