@@ -7,7 +7,6 @@ const WebGL = () => {
   var [recorder, setRecorder] = useState(null);
   var [data, setData] = useState([]);
   const [filenames, setFilenames] = useState([]);
-  const [filename, setFilename] = useState([]);
   const [textValue, setTextValue] = useState("");
   const [filenameValue, setFilenameValue] = useState("");
   const [message, setMessage] = useState("");
@@ -42,58 +41,62 @@ const WebGL = () => {
       data.push(event.data);
     };
     recorder.start();
-    console.log("recording started");
     await new Promise((resolve) => setTimeout(resolve, 6000));
     recorder.stop();
     const blob = new Blob(data, { type: "video/webm" });
     if (blob.size === 0) {
-      console.log("No data recorded");
       setSuccess(false);
-      setMessage("Error generating video");
-      return;
-    }
-
-    console.log(blob);
-    console.log("recording stopped");
-
-    var url = URL.createObjectURL(blob);
-    var video = document.querySelector("video");
-    video.src = url;
-    var formData = new FormData();
-    formData.append("video_file", blob, "input_video.webm");
-    const text = document.getElementById("script").value;
-    console.log(filenameValue);
-    const email = localStorage.getItem("name");
-    if (filenameValue == "default") {
-      var query =
-        process.env.REACT_APP_MLSERVER +
-        `/generateVideo?text=${text}&speaker=VCTK_old_20I-2440@nu.edu.pk&email=${email}`;
-      setSuccess(true);
-      setMessage("Video Generated Successfully");
+      setMessage("Error Recording Video");
     } else {
-      if (filenameValue != "") {
+      var url = URL.createObjectURL(blob);
+      var video = document.querySelector("video");
+      video.src = url;
+
+      var formData = new FormData();
+      formData.append("video_file", blob, "input_video.webm");
+      const text = document.getElementById("script").value;
+      const email = localStorage.getItem("name");
+
+      if (filenameValue == "default") {
         var query =
           process.env.REACT_APP_MLSERVER +
-          `/generateVideo?text=${text}&voicename=${filenameValue}&email=${email}`;
-        setSuccess(true);
-        setMessage("Video Generated Successfully");
+          `/generateVideo?text=${text}&speaker=VCTK_old_20I-2440@nu.edu.pk&email=${email}`;
       } else {
-        return;
+        if (filenameValue != "") {
+          var query =
+            process.env.REACT_APP_MLSERVER +
+            `/generateVideo?text=${text}&voicename=${filenameValue}&email=${email}`;
+        }
+      }
+
+      let response = null;
+      try {
+        response = await axios
+          .post(query, formData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+            responseType: "blob",
+          })
+          .catch((error) => {
+            setSuccess(false);
+            setMessage("Network Error");
+          });
+      } catch (error) {
+        setSuccess(false);
+        setMessage("Network Error");
+      }
+
+      if (response === null || response.data.type !== "video/mp4") {
+        setSuccess(false);
+        setMessage("Network Error Video not generated");
+      } else {
+        setSuccess(true);
+        setMessage("Video Generated");
+        url = URL.createObjectURL(response.data);
+        video.src = url;
       }
     }
-    let response = await axios.post(query, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-      responseType: "blob",
-    });
-    console.log(response);
-    if (response.data.type !== "video/mp4") {
-      console.error("Response is not a video file");
-      return;
-    }
-    url = URL.createObjectURL(response.data);
-    video.src = url;
   }
 
   return (
@@ -128,7 +131,7 @@ const WebGL = () => {
               onClick={generateVideo}
               disabled={textValue.trim().length < 20 || !filenameValue.trim()}
               className="btn btn-primary btn-lg"
-              style={{ height: "10vh", marginTop: "2vh" }}
+              style={{ height: "10vh", marginTop: "2vh", fontSize: "2vh" }}
             >
               Generate Video
             </button>
@@ -156,8 +159,8 @@ const WebGL = () => {
         <MyThreeScene canvasRef={canvasRef} />
         <video
           id="video"
-          width="42%"
-          height="42%"
+          width="600px"
+          height="400px"
           controls
           style={{ display: "block", margin: "0 auto" }}
         ></video>
