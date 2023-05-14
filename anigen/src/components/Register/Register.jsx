@@ -37,7 +37,7 @@ const Register = () => {
     }
     else if(name && email && password && password === confirmPassword){
        console.log(password);
-      axios.post("http://localhost:4000/r", user)
+      axios.post(process.env.REACT_APP_BACKENDURL+"/r", user)
       .then( res =>{
         console.log(res.data.message)
     if(res.data.message==="Successfully Registered"){

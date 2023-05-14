@@ -18,7 +18,7 @@ const WebGL=() => {
     const fetchFilenames = async () => {
       try {
         const email = localStorage.getItem('name');
-        const response = await axios.get(`http://localhost:4000/TTS/${email}/filenames`);
+        const response = await axios.get(process.env.REACT_APP_BACKENDURL+`/TTS/${email}/filenames`);
         setFilenames(response.data.filenames);
       } catch (error) {
         console.error(error);
@@ -67,13 +67,13 @@ const WebGL=() => {
       console.log(filenameValue);
       const email=localStorage.getItem("name");
       if(filenameValue=="default"){
-      var query = `http://localhost:5000/generateVideo?text=${text}&speaker=VCTK_old_20I-2440@nu.edu.pk&email=${email}`;
+      var query = process.env.REACT_APP_MLSERVER+`/generateVideo?text=${text}&speaker=VCTK_old_20I-2440@nu.edu.pk&email=${email}`;
       setSuccess(true);
       setMessage("Video Generated Successfully");
     }
     else{
       if(filenameValue!=""){
-        var query = `http://localhost:5000/generateVideo?text=${text}&voicename=${filenameValue}&email=${email}`;
+        var query = process.env.REACT_APP_MLSERVER+`/generateVideo?text=${text}&voicename=${filenameValue}&email=${email}`;
         setSuccess(true);
         setMessage("Video Generated Successfully");
       }

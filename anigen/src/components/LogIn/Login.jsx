@@ -27,7 +27,7 @@ const Login = () => {
   });
 
   const logInUser = () =>{
-    axios.post("http://localhost:4000/login",user)
+    axios.post(process.env.REACT_APP_BACKENDURL+"/login",user)
     .then( res => {
       if(res.data.message==='LogIn successful'){
         localStorage.setItem("user",res.data.user);

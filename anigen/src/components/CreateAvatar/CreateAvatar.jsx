@@ -66,7 +66,7 @@ const CreateAvatar = () => {
       console.log("data");
       console.log(user);
       
-      axios.post("http://localhost:4000/avatar",user)
+      axios.post(process.env.REACT_APP_BACKENDURL+"/avatar",user)
         .then(response => {
           if(response.data.message==="Avatar URL updated successfully")
           {

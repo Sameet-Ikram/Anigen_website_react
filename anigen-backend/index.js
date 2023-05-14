@@ -3,18 +3,18 @@ import express from "express"
 import cors from "cors"
 import mongoose from "mongoose"
 
+
 const app = express()
 app.use(express.json())
 app.use(express.urlencoded())
 app.use(cors())
 
-  mongoose.connect("mongodb://localhost:27017/AnigenDB", {
- // mongoose.connect("mongodb+srv://umairafzal92:gearofwar1234@cluster0.kn9tbkm.mongodb.net/?retryWrites=true&w=majority",{
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-}, () => {
-    console.log("DB connected")
-})
+const uri = process.env.DBURL
+
+
+mongoose.connect(uri,
+  { useNewUrlParser: true, useUnifiedTopology: true }
+,()=>{console.log("connected")});
 
 
 const userSchema = new mongoose.Schema({

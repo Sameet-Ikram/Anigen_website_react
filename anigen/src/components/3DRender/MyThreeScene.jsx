@@ -36,7 +36,7 @@ const MyThreeScene = () => {
 
     try {
       const email= localStorage.getItem("name");
-      const response = await axios.get(`http://localhost:4000/ThreeScene/${email}/avatarurl`);
+      const response = await axios.get(process.env.REACT_APP_BACKENDURL+`/ThreeScene/${email}/avatarurl`);
       avatarurl = await response.data.avatarurl;
       console.log(avatarurl);
     } catch (error) {

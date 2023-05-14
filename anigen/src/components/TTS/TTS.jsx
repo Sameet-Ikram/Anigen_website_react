@@ -40,7 +40,7 @@ const handleReplay = () => {
     const fetchFilenames = async () => {
       try {
         const email = localStorage.getItem('name');
-        const response = await axios.get(`http://localhost:4000/TTS/${email}/filenames`);
+        const response = await axios.get(process.env.REACT_APP_BACKENDURL+`/TTS/${email}/filenames`);
         setFilenames(response.data.filenames);
       } catch (error) {
         console.error(error);
@@ -66,14 +66,14 @@ const handleReplay = () => {
     const voicename=document.getElementById("voicename").value;
     console.log(voicename);
            try {
-           const response = await axios.post(`http://localhost:4000/TTS/${email}`,{filename:voicename});
+           const response = await axios.post(process.env.REACT_APP_BACKENDURL+`/TTS/${email}`,{filename:voicename});
            } catch (error) {
              console.error(error);
            }
      const blobb = new Blob([blob], { type: 'audio/wav' });
      formData.append('audio_file', blob, filenamme);
     try {
-      const res = await axios.post(`http://localhost:5000/addVoice?email=${email}&voicename=${voicename}`, formData); // Do something with the response
+      const res = await axios.post(process.env.REACT_APP_MLSERVER+`/addVoice?email=${email}&voicename=${voicename}`, formData); // Do something with the response
     } catch (error) {
       console.error(error);
     }
@@ -100,7 +100,7 @@ const handleReplay = () => {
     const email=localStorage.getItem("name");
     if(filenameValue=="default"){
     try {
-       const res = await axios.get(`http://localhost:5000/generateaudio?text=${script}&speaker=VCTK_old_20I-2440@nu.edu.pk`,{ responseType: 'blob'} );
+       const res = await axios.get(process.env.REACT_APP_MLSERVER+`/generateaudio?text=${script}&speaker=VCTK_old_20I-2440@nu.edu.pk`,{ responseType: 'blob'} );
                 let blob = new Blob([res.data], { type: 'audio/wav' });
                 console.log(blob);
                 audioUrl = URL.createObjectURL(blob);
@@ -119,7 +119,7 @@ const handleReplay = () => {
   {
     if(filenameValue!=""){
     try {
-       const res = await axios.get(`http://localhost:5000/generateaudio?text=${script}&voicename=${filenameValue}&email=${email}`,{ responseType: 'blob'} );
+       const res = await axios.get(process.env.REACT_APP_MLSERVER+`/generateaudio?text=${script}&voicename=${filenameValue}&email=${email}`,{ responseType: 'blob'} );
                 let blob = new Blob([res.data], { type: 'audio/wav' });
                 console.log(blob);
                 audioUrl = URL.createObjectURL(blob);
