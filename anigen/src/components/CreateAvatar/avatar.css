@@ -9,9 +9,10 @@
   margin: 1rem;
 } */
 .iFrame {
+  /* display: block; */
   border: none;
   width: 100%;
-  height: calc(100vh - 100px);
+  height: 100vh;
 }
 
 .toggleButton {

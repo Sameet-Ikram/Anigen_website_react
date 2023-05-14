@@ -1,54 +1,52 @@
+const express = require("express");
+const cors = require("cors");
+const mongoose = require("mongoose");
 
-import express from "express"
-import cors from "cors"
-import mongoose from "mongoose"
+const app = express();
+app.use(express.json());
+app.use(express.urlencoded());
+app.use(cors());
 
+console.log(process.env.DBURL2);
 
-const app = express()
-app.use(express.json())
-app.use(express.urlencoded())
-app.use(cors())
-
-const uri = process.env.DBURL
-
-
-mongoose.connect(uri,
-  { useNewUrlParser: true, useUnifiedTopology: true }
-,()=>{console.log("connected")});
-
+mongoose
+  .connect(process.env.DBURL2, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("Database connected!"))
+  .catch((err) => console.log(err));
 
 const userSchema = new mongoose.Schema({
-  name:String,
-  email:String,
-  password:String,
+  name: String,
+  email: String,
+  password: String,
   avatarUrl: {
     type: String,
-    default: ""
+    default: "",
   },
-  filename:{
+  filename: {
     type: [String],
-    default: ["default"]
-  }
-})
-const User = new mongoose.model("User", userSchema)
+    default: ["default"],
+  },
+});
+const User = new mongoose.model("User", userSchema);
 //Routes
-app.post("/login",(req,res)=>{
-  const { email, password} = req.body
+app.post("/login", (req, res) => {
+  const { email, password } = req.body;
   console.log("Login");
-  User.findOne({email:email},(err,user)=>{
-    if(user){
-      if(password===user.password){
-        res.send({message:"LogIn successful",user:user})
+  User.findOne({ email: email }, (err, user) => {
+    if (user) {
+      if (password === user.password) {
+        res.send({ message: "LogIn successful", user: user });
+      } else {
+        res.send({ message: "Password did not match", user: user });
       }
-      else{
-        res.send({message:"Password did not match",user:user})
-      }
+    } else {
+      res.send({ message: "User not found", user: user });
     }
-    else{
-      res.send({message:"User not found",user:user})
-    }
-  })
-})
+  });
+});
 
 app.get("/TTS/:email/filenames", (req, res) => {
   const email = req.params.email;
@@ -72,7 +70,6 @@ app.get("/ThreeScene/:email/avatarurl", (req, res) => {
   });
 });
 
-
 app.post("/TTS/:email", (req, res) => {
   const email = req.params.email;
   console.log(req.body);
@@ -94,65 +91,56 @@ app.post("/TTS/:email", (req, res) => {
   });
 });
 
-
-
-
 app.post("/avatar", (req, res) => {
-
   const { email, avatarUrl } = req.body;
-  if (avatarUrl==='') {
+  if (avatarUrl === "") {
     console.log("empty");
     res.send({ message: "Avatar URL is empty" });
+  } else {
+    console.log("Updating avatar for user with email:", email);
+    console.log("New avatar URL:", avatarUrl);
+    User.findOne({ email: email }, (err, user) => {
+      if (user) {
+        user.avatarUrl = avatarUrl;
+        user.save((err) => {
+          if (err) {
+            console.log(err);
+            res.send({ message: "Error updating user" });
+          } else {
+            res.send({ message: "Avatar URL updated successfully" });
+          }
+        });
+      } else {
+        res.send({ message: "User not found" });
+      }
+    });
   }
-  else{
-  console.log("Updating avatar for user with email:", email);
-  console.log("New avatar URL:", avatarUrl);
-  User.findOne({ email: email }, (err, user) => {
-    if (user) {
-      user.avatarUrl = avatarUrl;
-      user.save((err) => {
-        if (err) {
-          console.log(err);
-          res.send({ message: "Error updating user" });
-        } else {
-          res.send({ message: "Avatar URL updated successfully" });
-        }
-      });
-    } else {
-      res.send({ message: "User not found" });
-    }
-  });
-}
 });
 
-
-app.post("/r",(req,res)=>{
-  const { name, email, password} = req.body
-  User.findOne({email:email},(err,user)=>{
-    if(user){
-      res.send({message:"User already registered"})
-    }
-    else{
+app.post("/r", (req, res) => {
+  const { name, email, password } = req.body;
+  User.findOne({ email: email }, (err, user) => {
+    if (user) {
+      res.send({ message: "User already registered" });
+    } else {
       const user = new User({
         name,
         email,
-        password
-      })
-      user.save(err => {
-        if(err){
-          res.send(err)
+        password,
+      });
+      user.save((err) => {
+        console.log(err);
+        if (err) {
+          res.send({ message: "Error" });
+        } else {
+          res.send({ message: "Successfully Registered" });
         }
-        else{
-          res.send({message: "Successfully Registered"})
-        }
-      })
+      });
     }
-  })
-
+  });
 });
-
 
 const port = process.env.PORT || 4000;
 const server = app.listen(port, () => {
-  console.log('Connected to port ' + port)
-})
+  console.log("Connected to port " + port);
+});
