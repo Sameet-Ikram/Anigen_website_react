@@ -7,10 +7,10 @@ app.use(express.json());
 app.use(express.urlencoded());
 app.use(cors());
 
-console.log(process.env.DBURL2);
+console.log(process.env.DBURL);
 
 mongoose
-  .connect(process.env.DBURL2, {
+  .connect(process.env.DBURL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
